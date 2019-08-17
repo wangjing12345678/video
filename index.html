@@ -1,121 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>get video</title>
+<html><head>
+    <title>HTML5 code Reader</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 </head>
-<style>
-    .box1 {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    button {
-        width: 100%;
-        padding: 6px 0;
-    }
-    video,
-    canvas {
-        border: 1px solid #000;
-        display: block;
-    }
-    p {
-        line-height: 1.5em;
-        border-left: 10px solid #ccc;
-        text-align: justify;
-        background-color: #eee;
-        padding: 10px;
-    }
-    label{
-        display: block;
-        padding: 6px 0;
-    }
-    label input[type=file]{
-        border: 1px solid #000;
-        box-sizing: border-box;
-    }
+<style type="text/css">
+    html, body { height: 100%; width: 100%; text-align:center; }
 </style>
-
-<body>
-<div>
-    <b>è°ƒç”¨ç§»åŠ¨ç«¯æ‘„åƒå¤´</b><br>
-    <label>ç…§ç›¸æœºï¼š <input type="file" id='image' accept="image/*" capture='camera'></label>
-    <label>æ‘„åƒæœºï¼š <input type="file" id='video' accept="video/*" capture='camcorder'></label>
-</div>
-<hr>
-<div class="box1">
-    <div>
-        <button onclick="getMedia()">å¼€å¯æ‘„åƒå¤´</button>
-        <video id="video" width="600" height="400" autoplay="autoplay"></video>
-    </div>
-    <div>
-        <button onclick="takePhoto()">æ‹ç…§</button>
-        <canvas id="canvas" width="600" height="400"></canvas>
-    </div>
-</div>
-<hr>
-<div class="box2">
-    <p>
-        <b>MediaDevices.getUserMedia()</b>ä¼šæç¤ºç”¨æˆ·ç»™äºˆä½¿ç”¨åª’ä½“è¾“å…¥çš„è®¸å¯ï¼Œåª’ä½“è¾“å…¥ä¼šäº§ç”Ÿä¸€ä¸ªMediaStreamï¼Œé‡Œé¢åŒ…å«äº†è¯·æ±‚çš„åª’ä½“ç±»å‹çš„è½¨é“ã€‚æ­¤æµå¯ä»¥åŒ…å«ä¸€ä¸ªè§†é¢‘è½¨é“ï¼ˆæ¥è‡ªç¡¬ä»¶æˆ–è€…è™šæ‹Ÿè§†é¢‘æºï¼Œæ¯”å¦‚ç›¸æœºã€è§†é¢‘é‡‡é›†è®¾å¤‡å’Œå±å¹•å…±äº«æœåŠ¡ç­‰ç­‰ï¼‰ã€ä¸€ä¸ªéŸ³é¢‘è½¨é“ï¼ˆåŒæ ·æ¥è‡ªç¡¬ä»¶æˆ–è™šæ‹ŸéŸ³é¢‘æºï¼Œæ¯”å¦‚éº¦å…‹é£ã€A/Dè½¬æ¢å™¨ç­‰ç­‰ï¼‰ï¼Œä¹Ÿå¯èƒ½æ˜¯å…¶å®ƒè½¨é“ç±»å‹ã€‚
-        å®ƒè¿”å›ä¸€ä¸ª Promise å¯¹è±¡ï¼ŒæˆåŠŸåä¼šresolveå›è°ƒä¸€ä¸ª MediaStream å¯¹è±¡ã€‚è‹¥ç”¨æˆ·æ‹’ç»äº†ä½¿ç”¨æƒé™ï¼Œæˆ–è€…éœ€è¦çš„åª’ä½“æºä¸å¯ç”¨ï¼Œpromiseä¼šrejectå›è°ƒä¸€ä¸ª<b>PermissionDeniedError</b>æˆ–è€…<b>NotFoundError</b>ã€‚
-        è¿”å›çš„promiseå¯¹è±¡å¯èƒ½æ—¢ä¸ä¼šresolveä¹Ÿä¸ä¼šrejectï¼Œå› ä¸ºç”¨æˆ·ä¸æ˜¯å¿…é¡»é€‰æ‹©å…è®¸æˆ–æ‹’ç»ã€‚
-    </p>
-    <p>
-        <b>constraints</b><br>
-        ä½œä¸ºä¸€ä¸ªMediaStreamConstraints å¯¹è±¡ï¼ŒæŒ‡å®šäº†è¯·æ±‚çš„åª’ä½“ç±»å‹å’Œç›¸å¯¹åº”çš„å‚æ•°ã€‚
-        constraints å‚æ•°æ˜¯ä¸€ä¸ªåŒ…å«äº†video å’Œ audioä¸¤ä¸ªæˆå‘˜çš„MediaStreamConstraints
-        å¯¹è±¡ï¼Œç”¨äºè¯´æ˜è¯·æ±‚çš„åª’ä½“ç±»å‹ã€‚å¿…é¡»è‡³å°‘ä¸€ä¸ªç±»å‹æˆ–è€…ä¸¤ä¸ªåŒæ—¶å¯ä»¥è¢«æŒ‡å®šã€‚å¦‚æœæµè§ˆå™¨æ— æ³•æ‰¾åˆ°æŒ‡å®šçš„åª’ä½“ç±»å‹æˆ–è€…æ— æ³•æ»¡è¶³ç›¸å¯¹åº”çš„å‚æ•°è¦æ±‚ï¼Œé‚£ä¹ˆè¿”å›çš„Promiseå¯¹è±¡å°±ä¼šå¤„äºrejectedï¼»å¤±è´¥ï¼½çŠ¶æ€ï¼ŒNotFoundErrorä½œä¸ºrejectedï¼»å¤±è´¥ï¼½å›è°ƒçš„å‚æ•°ã€‚
-    </p>
-    <p>
-        <b>åˆ‡æ¢å‰ç½®åç½®æ‘„åƒå¤´</b><br>
-        var front = false;<br>
-        document.getElementById('flip-button').onclick = function() { front = !front; };<br>
-        var constraints = { video: { facingMode: (front? "user" : "environment") } };
-    </p>
-</div>
-
+<script src="jquery-3.3.1.min.js"></script>
 <script>
-    function getMedia() {
-        let constraints = {
-            video: {
-                width: 600,
-                height: 400
-            },
-            audio: true
-        };
-        //è·å¾—videoæ‘„åƒå¤´åŒºåŸŸ
-        let video = document.getElementById("video");
-        // è¿™é‡Œä»‹ç»æ–°çš„æ–¹æ³•ï¼Œè¿”å›ä¸€ä¸ª Promiseå¯¹è±¡
-        // è¿™ä¸ªPromiseå¯¹è±¡è¿”å›æˆåŠŸåçš„å›è°ƒå‡½æ•°å¸¦ä¸€ä¸ª MediaStream å¯¹è±¡ä½œä¸ºå…¶å‚æ•°
-        // then()æ˜¯Promiseå¯¹è±¡é‡Œçš„æ–¹æ³•
-        // then()æ–¹æ³•æ˜¯å¼‚æ­¥æ‰§è¡Œï¼Œå½“then()å‰çš„æ–¹æ³•æ‰§è¡Œå®Œåå†æ‰§è¡Œthen()å†…éƒ¨çš„ç¨‹åº
-        // é¿å…æ•°æ®æ²¡æœ‰è·å–åˆ°
-        let promise = navigator.mediaDevices.getUserMedia(constraints);
-        // æˆåŠŸè°ƒç”¨
-        promise.then(function (MediaStream) {
-            /* ä½¿ç”¨è¿™ä¸ªMediaStream */
-            video.src = MediaStream;
-            // video.srcObject = (window.URL || window.webkitURL).createObjectURL(MediaStream);
-            video.play();
-            console.log(MediaStream); // å¯¹è±¡
-        })
-        // å¤±è´¥è°ƒç”¨
-        promise.catch(function (err) {
-            /* å¤„ç†error */
-            console.log(err); // æ‹’ç­¾
-        });
+    //Õâ¶Î´ú Ö÷ÒªÊÇ»ñÈ¡ÉãÏñÍ·µÄÊÓÆµÁ÷²¢ÏÔÊ¾ÔÚVideo Ç©ÖĞ
+    var canvas=null,context=null,video=null;
+    window.addEventListener("DOMContentLoaded", function ()
+    {
+        try{
+            canvas = document.getElementById("canvas");
+            context = canvas.getContext("2d");
+            video = document.getElementById("video");
+
+            var videoObj = { "video": true,audio:false},
+                flag=true,
+                MediaErr = function (error)
+                {
+                    flag=false;
+                    if (error.PERMISSION_DENIED)
+                    {
+                        alert('ÓÃ»§¾Ü¾øÁËä¯ÀÀÆ÷ÇëÇóÃ½ÌåµÄÈ¨ÏŞ', 'ÌáÊ¾');
+                    } else if (error.NOT_SUPPORTED_ERROR) {
+                        alert('¶Ô²»Æğ£¬ÄúµÄä¯ÀÀÆ÷²»Ö§³ÖÅÄÕÕ¹¦ÄÜ£¬ÇëÊ¹ÓÃÆäËûä¯ÀÀÆ÷', 'ÌáÊ¾');
+                    } else if (error.MANDATORY_UNSATISFIED_ERROR) {
+                        alert('Ö¸¶¨µÄÃ½ÌåÀàĞÍÎ´½ÓÊÕµ½Ã½ÌåÁ÷', 'ÌáÊ¾');
+                    } else {
+                        alert('ÏµÍ³Î´ÄÜ»ñÈ¡µ½ÉãÏñÍ·£¬ÇëÈ·±£ÉãÏñÍ·ÒÑÕıÈ·°²×°¡£»ò³¢ÊÔË¢ĞÂÒ³Ãæ£¬ÖØÊÔ', 'ÌáÊ¾');
+                    }
+                };
+            //»ñÈ¡Ã½ÌåµÄ¼æÈİ´úÂë£¬Ä¿Ç°Ö»Ö§³Ö£¨Firefox,Chrome,Opera£©
+            if (navigator.getUserMedia)
+            {
+                //qqä¯ÀÀÆ÷²»Ö§³Ö
+                if (navigator.userAgent.indexOf('MQQBrowser') > -1) {
+                    alert('¶Ô²»Æğ£¬ÄúµÄä¯ÀÀÆ÷²»Ö§³ÖÅÄÕÕ¹¦ÄÜ£¬ÇëÊ¹ÓÃÆäËûä¯ÀÀÆ÷', 'ÌáÊ¾');
+                    return false;
+                }
+                navigator.getUserMedia(videoObj, function (stream) {
+                    video.src = stream;
+                    video.play();
+                }, MediaErr);
+            }
+            else if(navigator.webkitGetUserMedia)
+            {
+                navigator.webkitGetUserMedia(videoObj, function (stream)
+                {
+                    video.src = window.webkitURL.createObjectURL(stream);
+                    video.play();
+                }, MediaErr);
+            }
+            else if (navigator.mozGetUserMedia)
+            {
+                navigator.mozGetUserMedia(videoObj, function (stream) {
+                    video.src = window.URL.createObjectURL(stream);
+                    video.play();
+                }, MediaErr);
+            }
+            else if (navigator.msGetUserMedia)
+            {
+                navigator.msGetUserMedia(videoObj, function (stream) {
+                    $(document).scrollTop($(window).height());
+                    video.src = window.URL.createObjectURL(stream);
+                    video.play();
+                }, MediaErr);
+            }else{
+                alert('¶Ô²»Æğ£¬ÄúµÄä¯ÀÀÆ÷²»Ö§³ÖÅÄÕÕ¹¦ÄÜ£¬ÇëÊ¹ÓÃÆäËûä¯ÀÀÆ÷');
+                return false;
+            }
+            if(flag){
+                alert('ÎªÁË»ñµÃ¸ü×¼È·µÄ²âÊÔ½á¹û£¬Çë¾¡Á¿½«¶şÎ¬ÂëÖÃÓÚ¿òÖĞ£¬È»ºó½øĞĞÅÄÉã¡¢É¨Ãè¡£ ÇëÈ·±£ä¯ÀÀÆ÷ÓĞÈ¨ÏŞÊ¹ÓÃÉãÏñ¹¦ÄÜ');
+            }
+            //Õâ¸öÊÇÅÄÕÕ°´Å¥µÄÊÂ¼ş£¬
+            $("#snap").click(function () {startPat();}).show();
+        }catch(e){
+            printHtml("ä¯ÀÀÆ÷²»Ö§³ÖHTML5 CANVAS");
+        }
+    }, false);
+
+    //´òÓ¡ÄÚÈİµ½Ò³Ãæ
+    function printHtml(content){
+        $(window.document.body).append(content+"<br/>");
     }
-    function takePhoto() {
-        //è·å¾—Canvaså¯¹è±¡
-        let video = document.getElementById("video");
-        let canvas = document.getElementById("canvas");
-        let ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, 600, 400);
+    //¿ªÊ¼ÅÄÕÕ
+    function startPat(){
+        setTimeout(function(){//·ÀÖ¹µ÷ÓÃ¹ı¿ì
+            if(context)
+            {
+                context.drawImage(video, 0, 0, 320, 320);
+                CatchCode();
+            }
+        },200);
+    }
+    //×¥ÆÁ»ñÈ¡Í¼ÏñÁ÷£¬²¢ÉÏ´«µ½·şÎñÆ÷
+    function CatchCode() {
+        if(canvas!=null)
+        {
+            //ÒÔÏÂ¿ªÊ¼±à Êı¾İ
+            var imgData = canvas.toDataURL();
+            //½«Í¼Ïñ×ª»»Îªbase64Êı¾İ
+            var base64Data = imgData;//.substr(22); //ÔÚÇ°¶Ë½ØÈ¡22Î»Ö®ºóµÄ×Ö·û´®×÷ÎªÍ¼ÏñÊı¾İ
+            //¿ªÊ¼Òì²½ÉÏ
+            $.post("saveimg.php", { "img": base64Data },function (result)
+            {
+                printHtml("½âÎö½á¹û£º"+result.data);
+                if (result.status == "success" && result.data!="")
+                {
+                    printHtml("½âÎö½á¹û³É¹¦£¡");
+                }else{
+                    startPat();//Èç¹ûÃ»ÓĞ½âÎö³öÀ´ÔòÖØĞÂ×¥ÅÄ½âÎö
+                }
+            },"json");
+        }
     }
 </script>
-</body>
+<body>
 
-</html>
+<div id="support"></div>
+<div id="contentHolder">
+    <video id="video" width="320" height="320" autoplay>
+    </video>
+    <canvas style="display:none; background-color:#F00;" id="canvas" width="320" height="320">
+    </canvas> <br/>
+    <button id="snap" style="display:none; height:50px; width:120px;">¿ªÊ¼É¨Ãè</button>
+</div>
+
+
+
+</body></html>
